@@ -1,0 +1,17 @@
+[project]
+name = "mcp-middleware"
+version = "0.1.0"
+description = "MCPShield Vulnerable Baseline Server"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "mcp>=1.0.0,<2.0.0",
+    "fastapi",
+    "uvicorn",
+]
+
+[dependency-groups]
+dev = [
+    "pyright>=1.1.411",
+    "ruff>=0.16.4",
+]
