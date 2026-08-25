@@ -26,7 +26,7 @@ from mcp.shared.message import SessionMessage
 
 from mcpshield.interceptors.chain import InterceptionDecision
 from mcpshield.interceptors.normalize import normalize
-from mcpshield.protocol.messages import Direction
+from mcpshield.protocol.messages import Direction, MessageDetails
 
 if TYPE_CHECKING:
     from mcpshield.config.settings import ContainmentConfiguration
@@ -182,16 +182,40 @@ class MLScanner:
         automatically by the pipeline.
         """
 
-        results = self._pipeline(text, truncation=True)  # type: ignore[operator]
-        if not isinstance(results, list) or len(results) == 0:
-            return 0.0
-        for result in results:
-            if isinstance(result, dict) and result.get("label") == self._injection_label:
-                return float(result.get("score", 0.0))
-        # If the top label is NOT the injection label, the injection score
-        # is 1.0 minus the top score (binary classification)
-        top_score = float(results[0].get("score", 1.0)) if isinstance(results[0], dict) else 1.0
-        return round(1.0 - top_score, 6)
+        # Fix Padding Bypass: Do not just truncate and scan the first 512 tokens.
+        # Chunk the text into roughly 2000-character segments (safe for most 512-token models)
+        # and scan all chunks, taking the highest score.
+        chunk_size = 2000
+        chunks = [text[i : i + chunk_size] for i in range(0, len(text), chunk_size)]
+        
+        # Limit to 20 chunks to prevent CPU DoS on massive files (10MB+)
+        if len(chunks) > 20:
+            # Take the first 10 and last 10 chunks (often covers headers/footers/payloads)
+            chunks = chunks[:10] + chunks[-10:]
+
+        highest_score = 0.0
+
+        for chunk in chunks:
+            if not chunk.strip():
+                continue
+                
+            results = self._pipeline(chunk, truncation=True)  # type: ignore[operator]
+            if not isinstance(results, list) or len(results) == 0:
+                continue
+                
+            chunk_score = 0.0
+            for result in results:
+                if isinstance(result, dict) and result.get("label") == self._injection_label:
+                    chunk_score = float(result.get("score", 0.0))
+                    break
+            else:
+                top_score = float(results[0].get("score", 1.0)) if isinstance(results[0], dict) else 1.0
+                chunk_score = round(1.0 - top_score, 6)
+                
+            if chunk_score > highest_score:
+                highest_score = chunk_score
+
+        return highest_score
 
 
 # ---------------------------------------------------------------------------
@@ -227,7 +251,7 @@ class InboundContainment:
             self._ml_scanner = None
 
     async def inspect(
-        self, direction: Direction, message: SessionMessage
+        self, direction: Direction, message: SessionMessage, details: MessageDetails
     ) -> InterceptionDecision:
         """Inspect inbound tool responses for indirect prompt injection."""
 
@@ -238,6 +262,15 @@ class InboundContainment:
         root = message.message.root
         if not isinstance(root, types.JSONRPCResponse):
             return InterceptionDecision.forward(message)
+
+        # Stage 2: Tool-level Risk Profiling
+        if self._high_risk_tools:
+            # Method enriched by inspect_message looks like "tools/call:read_file"
+            if details.method and details.method.startswith("tools/call:"):
+                tool_name = details.method.split(":", 1)[1]
+                if tool_name not in self._high_risk_tools:
+                    # Skip scanning for low-risk tools
+                    return InterceptionDecision.forward(message)
 
         result = root.result
         if not isinstance(result, dict) or "content" not in result:

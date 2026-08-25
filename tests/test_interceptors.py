@@ -9,7 +9,7 @@ from mcp.shared.message import SessionMessage
 
 from mcpshield.interceptors.chain import InterceptionAction
 from mcpshield.interceptors.limits import MessageSizeLimit
-from mcpshield.protocol.messages import Direction
+from mcpshield.protocol.messages import Direction, inspect_message
 
 
 def test_message_limit_blocks_an_oversized_request() -> None:
@@ -25,7 +25,8 @@ def test_message_limit_blocks_an_oversized_request() -> None:
             )
         )
     )
+    details = inspect_message(message)
     decision = asyncio.run(
-        MessageSizeLimit(maximum_bytes=100).inspect(Direction.CLIENT_TO_UPSTREAM, message)
+        MessageSizeLimit(maximum_bytes=100).inspect(Direction.CLIENT_TO_UPSTREAM, message, details)
     )
     assert decision.action is InterceptionAction.BLOCK

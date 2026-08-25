@@ -97,6 +97,11 @@ async def _stream_events(
     cursor = after
     while not await request.is_disconnected():
         events = await store.list_events(after=cursor, limit=100)
+        if not events:
+            yield ": ping\n\n"
+            await anyio.sleep(0.75)
+            continue
+
         for event in events:
             response = TraceResponse.from_event(event)
             cursor = response.event_id

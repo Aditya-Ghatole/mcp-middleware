@@ -121,7 +121,7 @@ class ProxyRuntime:
                 details = inspect_message(incoming)
                 self._track_request(direction, incoming, details.method)
                 details = self._attach_correlated_method(direction, incoming, details)
-                decision = await self._interceptors.inspect(direction, incoming)
+                decision = await self._interceptors.inspect(direction, incoming, details)
                 latency_ms = self._elapsed_ms(direction, incoming)
 
                 if decision.action is InterceptionAction.BLOCK:
@@ -176,6 +176,13 @@ class ProxyRuntime:
         request_id = inspect_message(message).request_id
         if request_id is None:
             return
+
+        # Bound the dictionary to prevent memory leaks if upstream drops requests
+        if len(self._request_started_at) > 10000:
+            oldest = next(iter(self._request_started_at))
+            self._request_started_at.pop(oldest, None)
+            self._request_methods.pop(oldest, None)
+
         self._request_started_at[request_id] = time.perf_counter()
         if method is not None:
             self._request_methods[request_id] = method

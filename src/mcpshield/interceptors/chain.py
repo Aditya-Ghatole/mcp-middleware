@@ -8,7 +8,7 @@ from typing import Protocol
 
 from mcp.shared.message import SessionMessage
 
-from mcpshield.protocol.messages import Direction
+from mcpshield.protocol.messages import Direction, MessageDetails
 
 
 class InterceptionAction(StrEnum):
@@ -37,7 +37,7 @@ class MessageInterceptor(Protocol):
     """A protocol-aware control that can inspect one message direction."""
 
     async def inspect(
-        self, direction: Direction, message: SessionMessage
+        self, direction: Direction, message: SessionMessage, details: MessageDetails
     ) -> InterceptionDecision: ...
 
 
@@ -48,13 +48,13 @@ class InterceptorChain:
     interceptors: tuple[MessageInterceptor, ...]
 
     async def inspect(
-        self, direction: Direction, message: SessionMessage
+        self, direction: Direction, message: SessionMessage, details: MessageDetails
     ) -> InterceptionDecision:
         """Apply the configured controls to a message."""
 
         decision = InterceptionDecision.forward(message)
         for interceptor in self.interceptors:
-            decision = await interceptor.inspect(direction, decision.message)
+            decision = await interceptor.inspect(direction, decision.message, details)
             if decision.action is InterceptionAction.BLOCK:
                 return decision
         return decision

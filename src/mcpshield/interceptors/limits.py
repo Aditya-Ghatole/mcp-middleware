@@ -7,7 +7,7 @@ from dataclasses import dataclass
 from mcp.shared.message import SessionMessage
 
 from mcpshield.interceptors.chain import InterceptionAction, InterceptionDecision
-from mcpshield.protocol.messages import Direction, inspect_message
+from mcpshield.protocol.messages import Direction, MessageDetails
 
 
 @dataclass(frozen=True, slots=True)
@@ -17,12 +17,11 @@ class MessageSizeLimit:
     maximum_bytes: int
 
     async def inspect(
-        self, direction: Direction, message: SessionMessage
+        self, direction: Direction, message: SessionMessage, details: MessageDetails
     ) -> InterceptionDecision:
         """Inspect serialized message size without retaining its payload."""
 
         del direction
-        details = inspect_message(message)
         if details.byte_count > self.maximum_bytes:
             reason = f"Message exceeds the {self.maximum_bytes}-byte configured limit"
             return InterceptionDecision(

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import sqlite3
+import threading
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from pathlib import Path
@@ -59,6 +60,7 @@ class TraceStore:
 
     def __init__(self, database_path: Path) -> None:
         self._database_path = database_path
+        self._local = threading.local()
 
     async def initialize(self) -> None:
         """Create the trace table and enable safe concurrent read access."""
@@ -165,7 +167,11 @@ class TraceStore:
         return True
 
     def _connect(self) -> sqlite3.Connection:
-        return sqlite3.connect(self._database_path, timeout=5.0)
+        if not hasattr(self._local, "connection"):
+            self._local.connection = sqlite3.connect(
+                self._database_path, timeout=5.0
+            )
+        return self._local.connection
 
     @staticmethod
     def _event_from_row(row: tuple[object, ...]) -> TraceEvent:

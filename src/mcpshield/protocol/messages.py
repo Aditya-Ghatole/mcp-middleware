@@ -37,7 +37,15 @@ def inspect_message(session_message: SessionMessage) -> MessageDetails:
     if isinstance(message, types.JSONRPCRequest | types.JSONRPCNotification):
         request_id = _request_id(message) if isinstance(message, types.JSONRPCRequest) else None
         summary = _request_summary(message.method, message.params)
-        return MessageDetails(message.method, request_id, summary, byte_count)
+        
+        # Enrich method name with tool name for finer-grained interceptor logic
+        enriched_method = message.method
+        if message.method == "tools/call" and isinstance(message.params, dict):
+            tool_name = message.params.get("name")
+            if isinstance(tool_name, str):
+                enriched_method = f"tools/call:{tool_name}"
+                
+        return MessageDetails(enriched_method, request_id, summary, byte_count)
 
     if isinstance(message, types.JSONRPCResponse):
         return MessageDetails(None, str(message.id), _response_summary(message.result), byte_count)
