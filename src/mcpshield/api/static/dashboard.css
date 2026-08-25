@@ -1,0 +1,22 @@
+:root { color-scheme: light dark; font-family: Inter, system-ui, sans-serif; }
+body { margin: 0; background: #f8fafc; color: #172033; }
+main { max-width: 1100px; margin: 0 auto; padding: 2rem; }
+header { display: flex; align-items: start; justify-content: space-between; gap: 1rem; border-bottom: 1px solid #cbd5e1; }
+h1 { margin: 0; font-size: 1.7rem; }
+h2 { margin-top: 2rem; font-size: 1.1rem; }
+p { color: #475569; }
+#connection-status { font-weight: 600; }
+.table-wrap { overflow-x: auto; border: 1px solid #cbd5e1; border-radius: .4rem; background: white; }
+table { width: 100%; border-collapse: collapse; font-size: .9rem; }
+th, td { padding: .7rem; text-align: left; border-bottom: 1px solid #e2e8f0; vertical-align: top; }
+th { background: #f1f5f9; font-size: .75rem; letter-spacing: .04em; text-transform: uppercase; }
+tr:last-child td { border-bottom: 0; }
+.direction, .decision { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .8rem; }
+@media (prefers-color-scheme: dark) {
+  body { background: #0f172a; color: #e2e8f0; }
+  p { color: #cbd5e1; }
+  header { border-color: #334155; }
+  .table-wrap { background: #172033; border-color: #334155; }
+  th { background: #1e293b; }
+  th, td { border-color: #334155; }
+}

@@ -1,0 +1,1 @@
+MCPShield test fixture: this file is intentionally outside the sandbox.

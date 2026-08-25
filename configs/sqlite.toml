@@ -1,0 +1,8 @@
+[upstream]
+command = "${python}"
+arguments = ["-m", "mcpshield.reference_servers.sqlite"]
+working_directory = ".."
+
+[runtime]
+trace_database = "../data/traces.db"
+max_message_bytes = 1000000

@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>MCPShield Traffic</title>
+    <link rel="stylesheet" href="/dashboard.css">
+  </head>
+  <body>
+    <main>
+      <header>
+        <div>
+          <h1>MCPShield Traffic</h1>
+          <p>Live, redacted records from the MCPShield proxy.</p>
+        </div>
+        <p id="connection-status" role="status">Connecting…</p>
+      </header>
+      <section aria-labelledby="trace-heading">
+        <h2 id="trace-heading">Observed MCP messages</h2>
+        <p id="empty-state">No proxy traffic has been recorded yet.</p>
+        <div class="table-wrap" hidden id="trace-table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Time</th>
+                <th>Direction</th>
+                <th>Method</th>
+                <th>Result</th>
+                <th>Latency</th>
+                <th>Details</th>
+              </tr>
+            </thead>
+            <tbody id="trace-rows"></tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+    <script src="/dashboard.js" defer></script>
+  </body>
+</html>

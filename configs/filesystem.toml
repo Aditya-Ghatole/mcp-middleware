@@ -1,0 +1,16 @@
+[upstream]
+command = "${python}"
+arguments = ["-m", "mcpshield.reference_servers.filesystem"]
+working_directory = ".."
+
+[runtime]
+trace_database = "../data/traces.db"
+max_message_bytes = 1000000
+
+[containment]
+enabled = true
+model_name = "protectai/deberta-v3-base-prompt-injection-v2"
+confidence_threshold_block = 0.85
+confidence_threshold_warn = 0.50
+high_risk_tools = ["read_file", "write_file"]
+use_onnx = false

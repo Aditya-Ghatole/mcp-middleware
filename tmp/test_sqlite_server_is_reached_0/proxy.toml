@@ -1,0 +1,10 @@
+[upstream]
+command = "${python}"
+arguments = ["-m", "mcpshield.reference_servers.sqlite"]
+working_directory = "D:/proj/mcp-middleware"
+
+[runtime]
+trace_database = "traces.db"
+max_message_bytes = 1000000
+[upstream.environment]
+MCPSHIELD_SQLITE_DATABASE = "D:/proj/mcp-middleware/tmp/test_sqlite_server_is_reached_0/reference.sqlite3"

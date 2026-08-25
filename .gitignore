@@ -5,6 +5,15 @@ build/
 dist/
 wheels/
 *.egg-info
+.pytest_cache/
+.coverage
+coverage.xml
 
 # Virtual environments
 .venv
+
+# Local runtime state
+data/*.db
+data/*.db-shm
+data/*.db-wal
+data/traces.db

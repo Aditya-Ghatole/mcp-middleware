@@ -1,0 +1,8 @@
+[upstream]
+command = "${python}"
+arguments = ["-m", "mcpshield.reference_servers.filesystem"]
+working_directory = "D:/proj/mcp-middleware"
+
+[runtime]
+trace_database = "traces.db"
+max_message_bytes = 1000000

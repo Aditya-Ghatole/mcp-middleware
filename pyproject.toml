@@ -1,17 +1,47 @@
 [project]
-name = "mcp-middleware"
+name = "mcpshield"
 version = "0.1.0"
-description = "MCPShield Vulnerable Baseline Server"
+description = "Transparent MCP security proxy and evaluation harness"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
-    "mcp>=1.0.0,<2.0.0",
-    "fastapi",
-    "uvicorn",
+    "fastapi>=0.141,<1.0",
+    "mcp>=1.29,<2.0",
+    "onnxruntime>=1.19",
+    "torch>=2.4",
+    "transformers>=4.45,<5.0",
+    "uvicorn>=0.38,<1.0",
 ]
+
+[project.scripts]
+mcpshield-proxy = "mcpshield.cli.proxy:main"
+mcpshield-api = "mcpshield.cli.api:main"
+mcpshield-demo-client = "mcpshield.cli.demo_client:main"
+mcpshield-filesystem-server = "mcpshield.reference_servers.filesystem:main"
+mcpshield-sqlite-server = "mcpshield.reference_servers.sqlite:main"
 
 [dependency-groups]
 dev = [
-    "pyright>=1.1.411",
-    "ruff>=0.16.4",
+    "pytest>=8.3,<9.0",
+    "pyright>=1.1.411,<2.0",
+    "ruff>=0.16.4,<1.0",
 ]
+
+[build-system]
+requires = ["hatchling>=1.27"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/mcpshield"]
+
+[tool.pyright]
+include = ["src", "tests"]
+typeCheckingMode = "strict"
+pythonVersion = "3.12"
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "ASYNC", "RUF"]
