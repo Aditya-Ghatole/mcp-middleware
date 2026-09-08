@@ -10,7 +10,12 @@ wheels/
 coverage.xml
 
 # Virtual environments
-.venv
+.venv*/
+
+# Test runner and local tool output
+tmp/
+*.log
+output/
 
 # Local runtime state
 data/*.db

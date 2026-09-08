@@ -18,18 +18,20 @@ def _arguments() -> argparse.Namespace:
     parser.add_argument("--config", required=True, type=Path, help="Path passed to mcpshield-proxy")
     parser.add_argument("--tool", default="read_file", help="Tool name to call after listing tools")
     parser.add_argument(
-        "--arguments",
-        default='{"path": "docs/report_2026.txt"}',
-        help="JSON object supplied to the selected tool",
+        "--arg",
+        dest="args",
+        action="append",
+        help="Arguments in key=value format (e.g., --arg path=file.txt). Can be specified multiple times.",
     )
     return parser.parse_args()
 
 
-async def _run(config_path: Path, tool_name: str, raw_arguments: str) -> None:
-    parsed_arguments = json.loads(raw_arguments)
-    if not isinstance(parsed_arguments, dict):
-        raise ValueError("--arguments must decode to a JSON object")
-    arguments = cast(dict[str, object], parsed_arguments)
+async def _run(config_path: Path, tool_name: str, args_list: list[str] | None) -> None:
+    arguments: dict[str, object] = {}
+    if args_list:
+        for item in args_list:
+            key, _, value = item.partition("=")
+            arguments[key.strip()] = value.strip()
     proxy_parameters = StdioServerParameters(
         command=sys.executable,
         args=["-m", "mcpshield.cli.proxy", "--config", str(config_path.resolve())],  # noqa: ASYNC240
@@ -47,7 +49,7 @@ def main() -> None:
     """Run one real MCP client interaction through the proxy."""
 
     arguments = _arguments()
-    asyncio.run(_run(arguments.config, arguments.tool, arguments.arguments))
+    asyncio.run(_run(arguments.config, arguments.tool, arguments.args))
 
 
 if __name__ == "__main__":

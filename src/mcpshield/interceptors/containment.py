@@ -109,25 +109,33 @@ class MLScanner:
 
         logger.info("Loading ML scanner model: %s (onnx=%s)", model_name, use_onnx)
 
+        try:
+            from transformers import (  # type: ignore[import-untyped, import-not-found]
+                AutoTokenizer,
+                pipeline,
+            )
+        except ImportError:
+            pass
+
         if use_onnx:
             try:
                 from optimum.onnxruntime import (
-                    ORTModelForSequenceClassification,  # type: ignore[import-untyped]
+                    ORTModelForSequenceClassification,  # type: ignore[import-untyped, import-not-found]
                 )
-                from transformers import AutoTokenizer, pipeline  # type: ignore[import-untyped]
-
-                tokenizer = AutoTokenizer.from_pretrained(model_name)
-                model = ORTModelForSequenceClassification.from_pretrained(model_name, export=True)
-                self._pipeline = pipeline("text-classification", model=model, tokenizer=tokenizer)
+                model = ORTModelForSequenceClassification.from_pretrained(model_name)  # type: ignore
+                tokenizer = AutoTokenizer.from_pretrained(model_name)  # type: ignore
+                self._pipeline = pipeline("text-classification", model=model, tokenizer=tokenizer)  # type: ignore
+                logger.info("Loading ML scanner model: %s (onnx=True)", model_name)
             except ImportError:
-                logger.warning("optimum not installed, falling back to PyTorch inference")
-                from transformers import pipeline  # type: ignore[import-untyped]
-
-                self._pipeline = pipeline("text-classification", model=model_name)
+                logger.warning(
+                    "ONNX runtime requested but optimum/onnxruntime not installed. "
+                    "Falling back to PyTorch."
+                )
+                self._pipeline = pipeline("text-classification", model=model_name)  # type: ignore
+                logger.info("Loading ML scanner model: %s (onnx=False)", model_name)
         else:
-            from transformers import pipeline  # type: ignore[import-untyped]
-
-            self._pipeline = pipeline("text-classification", model=model_name)
+            self._pipeline = pipeline("text-classification", model=model_name)  # type: ignore
+            logger.info("Loading ML scanner model: %s (onnx=False)", model_name)
 
         # Detect the model's label for "injection" (varies by model)
         # ProtectAI uses "INJECTION", Sentinel uses "MALICIOUS", etc.
@@ -209,7 +217,12 @@ class MLScanner:
                     chunk_score = float(result.get("score", 0.0))
                     break
             else:
-                top_score = float(results[0].get("score", 1.0)) if isinstance(results[0], dict) else 1.0
+                first_result = results[0]
+                top_score = (
+                    float(first_result.get("score", 1.0))
+                    if isinstance(first_result, dict)
+                    else 1.0
+                )
                 chunk_score = round(1.0 - top_score, 6)
                 
             if chunk_score > highest_score:

@@ -38,7 +38,7 @@ def test_filesystem_server_is_reached_through_proxy(tmp_path: Path) -> None:
 
     asyncio.run(scenario())
     events = asyncio.run(TraceStore(tmp_path / "traces.db").list_events(after=None, limit=20))
-    assert any(event.method == "tools/call" for event in events)
+    assert any(event.method == "tools/call:read_file" for event in events)
     assert any(event.latency_ms is not None for event in events)
 
 
