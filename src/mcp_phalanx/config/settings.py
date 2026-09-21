@@ -24,6 +24,16 @@ class UpstreamConfiguration:
 
 
 @dataclass(frozen=True, slots=True)
+class MetadataScanConfiguration:
+    """Settings for the L0 Metadata Scanning interceptor."""
+
+    enabled: bool
+    block_on_schema_violation: bool
+    block_on_suspicious_description: bool
+    max_description_length: int
+
+
+@dataclass(frozen=True, slots=True)
 class ContainmentConfiguration:
     """Settings for the L3 Inbound Containment interceptor."""
 
@@ -42,6 +52,7 @@ class ProxyConfiguration:
     upstream: UpstreamConfiguration
     trace_database: Path
     max_message_bytes: int
+    metadata_scan: MetadataScanConfiguration
     containment: ContainmentConfiguration
 
 
@@ -66,6 +77,23 @@ def load_proxy_configuration(path: Path) -> ProxyConfiguration:
     trace_database = _require_path(database_value, "runtime.trace_database", path.parent)
     max_message_bytes = _positive_int(runtime_table.get("max_message_bytes", 1_000_000),
         "runtime.max_message_bytes")
+
+    metadata_scan_table = _optional_table(document, "metadata_scan")
+    metadata_scan = MetadataScanConfiguration(
+        enabled=_boolean(metadata_scan_table.get("enabled", True), "metadata_scan.enabled"),
+        block_on_schema_violation=_boolean(
+            metadata_scan_table.get("block_on_schema_violation", True),
+            "metadata_scan.block_on_schema_violation",
+        ),
+        block_on_suspicious_description=_boolean(
+            metadata_scan_table.get("block_on_suspicious_description", True),
+            "metadata_scan.block_on_suspicious_description",
+        ),
+        max_description_length=_positive_int(
+            metadata_scan_table.get("max_description_length", 4096),
+            "metadata_scan.max_description_length",
+        ),
+    )
 
     containment_table = _optional_table(document, "containment")
     containment = ContainmentConfiguration(
@@ -97,6 +125,7 @@ def load_proxy_configuration(path: Path) -> ProxyConfiguration:
         ),
         trace_database=trace_database,
         max_message_bytes=max_message_bytes,
+        metadata_scan=metadata_scan,
         containment=containment,
     )
 

@@ -7,6 +7,12 @@ working_directory = ".."
 trace_database = "../data/traces.db"
 max_message_bytes = 1000000
 
+[metadata_scan]
+enabled = true
+block_on_schema_violation = true
+block_on_suspicious_description = true
+max_description_length = 4096
+
 [containment]
 enabled = true
 model_name = "protectai/deberta-v3-base-prompt-injection-v2"

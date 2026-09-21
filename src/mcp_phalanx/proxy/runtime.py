@@ -18,6 +18,7 @@ from mcp_phalanx.config.settings import ProxyConfiguration
 from mcp_phalanx.interceptors.chain import InterceptionAction, InterceptorChain
 from mcp_phalanx.interceptors.containment import InboundContainment
 from mcp_phalanx.interceptors.limits import MessageSizeLimit
+from mcp_phalanx.interceptors.metadata_scan import MetadataScan
 from mcp_phalanx.observability.traces import TraceEvent, TraceStore
 from mcp_phalanx.protocol.messages import (
     Direction,
@@ -44,9 +45,11 @@ class ProxyRuntime:
     def __post_init__(self) -> None:
         self._request_started_at = {}
         self._request_methods = {}
-        interceptors: list[MessageSizeLimit | InboundContainment] = [
+        interceptors: list[MessageSizeLimit | MetadataScan | InboundContainment] = [
             MessageSizeLimit(self.configuration.max_message_bytes),
         ]
+        if self.configuration.metadata_scan.enabled:
+            interceptors.append(MetadataScan(self.configuration.metadata_scan))
         if self.configuration.containment.enabled:
             interceptors.append(InboundContainment(self.configuration.containment))
         self._interceptors = InterceptorChain(
