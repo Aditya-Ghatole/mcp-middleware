@@ -1,5 +1,5 @@
 [project]
-name = "mcpshield"
+name = "mcp-phalanx"
 version = "0.1.0"
 description = "Transparent MCP security proxy and evaluation harness"
 readme = "README.md"
@@ -14,11 +14,11 @@ dependencies = [
 ]
 
 [project.scripts]
-mcpshield-proxy = "mcpshield.cli.proxy:main"
-mcpshield-api = "mcpshield.cli.api:main"
-mcpshield-demo-client = "mcpshield.cli.demo_client:main"
-mcpshield-filesystem-server = "mcpshield.reference_servers.filesystem:main"
-mcpshield-sqlite-server = "mcpshield.reference_servers.sqlite:main"
+mcp-phalanx-proxy = "mcp_phalanx.cli.proxy:main"
+mcp-phalanx-api = "mcp_phalanx.cli.api:main"
+mcp-phalanx-demo-client = "mcp_phalanx.cli.demo_client:main"
+mcp-phalanx-filesystem-server = "mcp_phalanx.reference_servers.filesystem:main"
+mcp-phalanx-sqlite-server = "mcp_phalanx.reference_servers.sqlite:main"
 
 [dependency-groups]
 dev = [
@@ -32,7 +32,7 @@ requires = ["hatchling>=1.27"]
 build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/mcpshield"]
+packages = ["src/mcp_phalanx"]
 
 [tool.pyright]
 include = ["src", "tests"]

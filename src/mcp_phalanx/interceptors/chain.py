@@ -8,7 +8,7 @@ from typing import Protocol
 
 from mcp.shared.message import SessionMessage
 
-from mcpshield.protocol.messages import Direction, MessageDetails
+from mcp_phalanx.protocol.messages import Direction, MessageDetails
 
 
 class InterceptionAction(StrEnum):

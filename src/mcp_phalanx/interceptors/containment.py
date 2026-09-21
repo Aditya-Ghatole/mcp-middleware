@@ -24,12 +24,12 @@ import anyio
 import mcp.types as types
 from mcp.shared.message import SessionMessage
 
-from mcpshield.interceptors.chain import InterceptionDecision
-from mcpshield.interceptors.normalize import normalize
-from mcpshield.protocol.messages import Direction, MessageDetails
+from mcp_phalanx.interceptors.chain import InterceptionDecision
+from mcp_phalanx.interceptors.normalize import normalize
+from mcp_phalanx.protocol.messages import Direction, MessageDetails
 
 if TYPE_CHECKING:
-    from mcpshield.config.settings import ContainmentConfiguration
+    from mcp_phalanx.config.settings import ContainmentConfiguration
 
 logger = logging.getLogger(__name__)
 
@@ -61,7 +61,7 @@ _HEURISTIC_PATTERNS: tuple[re.Pattern[str], ...] = (
 # ---------------------------------------------------------------------------
 
 _TAINT_PREFIX = (
-    "\u26a0\ufe0f [MCPSHIELD L3: POTENTIAL INDIRECT PROMPT INJECTION DETECTED]\n"
+    "\u26a0\ufe0f [MCP-PHALANX L3: POTENTIAL INDIRECT PROMPT INJECTION DETECTED]\n"
     "<untrusted_external_data>\n"
 )
 

@@ -8,9 +8,9 @@ from typing import Any, cast
 
 from fastapi.testclient import TestClient
 
-from mcpshield.api.app import create_app
-from mcpshield.observability.traces import TraceEvent, TraceStore
-from mcpshield.protocol.messages import Direction, MessageDetails
+from mcp_phalanx.api.app import create_app
+from mcp_phalanx.observability.traces import TraceEvent, TraceStore
+from mcp_phalanx.protocol.messages import Direction, MessageDetails
 
 
 def test_control_plane_lists_persisted_traces(tmp_path: Path) -> None:

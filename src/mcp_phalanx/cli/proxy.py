@@ -8,13 +8,13 @@ from pathlib import Path
 
 import anyio
 
-from mcpshield.config.settings import load_proxy_configuration
-from mcpshield.observability.traces import TraceStore
-from mcpshield.proxy.runtime import ProxyRuntime
+from mcp_phalanx.config.settings import load_proxy_configuration
+from mcp_phalanx.observability.traces import TraceStore
+from mcp_phalanx.proxy.runtime import ProxyRuntime
 
 
 def _arguments() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description="Run the MCPShield stdio proxy")
+    parser = argparse.ArgumentParser(description="Run the MCP-Phalanx stdio proxy")
     parser.add_argument("--config", required=True, type=Path, help="Path to a proxy TOML file")
     parser.add_argument("--log-level", default="INFO", help="Python log level")
     return parser.parse_args()

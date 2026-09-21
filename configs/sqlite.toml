@@ -1,6 +1,6 @@
 [upstream]
 command = "${python}"
-arguments = ["-m", "mcpshield.reference_servers.sqlite"]
+arguments = ["-m", "mcp_phalanx.reference_servers.sqlite"]
 working_directory = ".."
 
 [runtime]

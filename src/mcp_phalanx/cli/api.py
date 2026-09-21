@@ -1,4 +1,4 @@
-"""CLI entry point for MCPShield's read-only control plane."""
+"""CLI entry point for MCP-Phalanx's read-only control plane."""
 
 from __future__ import annotations
 
@@ -7,11 +7,11 @@ from pathlib import Path
 
 import uvicorn
 
-from mcpshield.api.app import create_app
+from mcp_phalanx.api.app import create_app
 
 
 def _arguments() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description="Run the MCPShield control-plane API")
+    parser = argparse.ArgumentParser(description="Run the MCP-Phalanx control-plane API")
     parser.add_argument("--database", type=Path, default=Path("data/traces.db"))
     parser.add_argument("--host", default="127.0.0.1")
     parser.add_argument("--port", default=8000, type=int)

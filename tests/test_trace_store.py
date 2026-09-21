@@ -5,8 +5,8 @@ from __future__ import annotations
 import asyncio
 from pathlib import Path
 
-from mcpshield.observability.traces import TraceEvent, TraceStore
-from mcpshield.protocol.messages import Direction, MessageDetails
+from mcp_phalanx.observability.traces import TraceEvent, TraceStore
+from mcp_phalanx.protocol.messages import Direction, MessageDetails
 
 
 def test_trace_store_persists_and_cursors_events(tmp_path: Path) -> None:

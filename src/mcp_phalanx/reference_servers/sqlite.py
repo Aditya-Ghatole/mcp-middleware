@@ -8,11 +8,11 @@ from pathlib import Path
 
 from mcp.server.fastmcp import FastMCP
 
-mcp = FastMCP("MCPShield Vulnerable SQLite Reference")
+mcp = FastMCP("MCP-Phalanx Vulnerable SQLite Reference")
 
 
 def _database_path() -> Path:
-    configured = os.environ.get("MCPSHIELD_SQLITE_DATABASE")
+    configured = os.environ.get("MCP_PHALANX_SQLITE_DATABASE")
     path = Path(configured) if configured is not None else Path("data/reference.sqlite3")
     path.parent.mkdir(parents=True, exist_ok=True)
     return path.resolve()

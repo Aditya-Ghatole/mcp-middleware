@@ -14,12 +14,12 @@ from mcp.client.stdio import StdioServerParameters, stdio_client
 from mcp.server.stdio import stdio_server
 from mcp.shared.message import SessionMessage
 
-from mcpshield.config.settings import ProxyConfiguration
-from mcpshield.interceptors.chain import InterceptionAction, InterceptorChain
-from mcpshield.interceptors.containment import InboundContainment
-from mcpshield.interceptors.limits import MessageSizeLimit
-from mcpshield.observability.traces import TraceEvent, TraceStore
-from mcpshield.protocol.messages import (
+from mcp_phalanx.config.settings import ProxyConfiguration
+from mcp_phalanx.interceptors.chain import InterceptionAction, InterceptorChain
+from mcp_phalanx.interceptors.containment import InboundContainment
+from mcp_phalanx.interceptors.limits import MessageSizeLimit
+from mcp_phalanx.observability.traces import TraceEvent, TraceStore
+from mcp_phalanx.protocol.messages import (
     Direction,
     MessageDetails,
     blocked_error,
@@ -155,7 +155,7 @@ class ProxyRuntime:
         latency_ms: float | None,
     ) -> None:
         if not is_request(message) and response_request_id(message) is None:
-            message_text = "MCPShield cannot block a notification without a response id"
+            message_text = "MCP-Phalanx cannot block a notification without a response id"
             raise RuntimeError(message_text)
         await destination.send(blocked_error(message, reason or "Policy denied this message"))
         await self._record(

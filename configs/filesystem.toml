@@ -1,6 +1,6 @@
 [upstream]
 command = "${python}"
-arguments = ["-m", "mcpshield.reference_servers.filesystem"]
+arguments = ["-m", "mcp_phalanx.reference_servers.filesystem"]
 working_directory = ".."
 
 [runtime]

@@ -1,13 +1,13 @@
-# MCPShield — Project Context for AI Contributors
+# MCP-Phalanx — Project Context for AI Contributors
 
-Read this document before changing MCPShield. It explains the project’s purpose, current state, and non-negotiable engineering and academic rules.
+Read this document before changing MCP-Phalanx. It explains the project’s purpose, current state, and non-negotiable engineering and academic rules.
 
 ## 1. Project in plain language
 
-MCPShield is a local security proxy for **Model Context Protocol (MCP)** tool traffic. It sits between an MCP host (for example, an AI application) and an MCP tool server:
+MCP-Phalanx is a local security proxy for **Model Context Protocol (MCP)** tool traffic. It sits between an MCP host (for example, an AI application) and an MCP tool server:
 
 ```text
-MCP host / client  <->  MCPShield proxy  <->  upstream MCP server
+MCP host / client  <->  MCP-Phalanx proxy  <->  upstream MCP server
                               |
                               +-> redacted trace store -> read-only dashboard
 ```
@@ -31,16 +31,16 @@ Always preserve these claims and limits:
 
 ### Implemented foundation
 
-- `src/mcpshield/proxy/`: a bidirectional stdio MCP proxy. It starts one upstream process for the proxy lifetime; it does **not** start a subprocess per HTTP request.
-- `src/mcpshield/protocol/`: JSON-RPC inspection, response correlation, and protocol-correct blocked-message construction.
-- `src/mcpshield/observability/`: SQLite-backed, redacted trace events. Raw tool payloads are not stored in the dashboard trace database.
-- `src/mcpshield/api/`: a read-only FastAPI control plane and an honest, framework-free dashboard. It must never forward or execute MCP tool calls.
-- `src/mcpshield/reference_servers/`: local filesystem and SQLite MCP fixtures used for controlled experiments.
+- `src/mcp_phalanx/proxy/`: a bidirectional stdio MCP proxy. It starts one upstream process for the proxy lifetime; it does **not** start a subprocess per HTTP request.
+- `src/mcp_phalanx/protocol/`: JSON-RPC inspection, response correlation, and protocol-correct blocked-message construction.
+- `src/mcp_phalanx/observability/`: SQLite-backed, redacted trace events. Raw tool payloads are not stored in the dashboard trace database.
+- `src/mcp_phalanx/api/`: a read-only FastAPI control plane and an honest, framework-free dashboard. It must never forward or execute MCP tool calls.
+- `src/mcp_phalanx/reference_servers/`: local filesystem and SQLite MCP fixtures used for controlled experiments.
 - `tests/`: unit, API, normalization, containment, and end-to-end proxy tests.
 
 ### Layer 3 status: inbound prompt-injection containment
 
-Layer 3 lives in `src/mcpshield/interceptors/containment.py`. It currently:
+Layer 3 lives in `src/mcp_phalanx/interceptors/containment.py`. It currently:
 
 1. observes inbound MCP tool responses;
 2. normalizes text to expose selected zero-width, homoglyph, and Base64 obfuscation attempts;
@@ -60,9 +60,9 @@ This is a containment mechanism, not proof that an LLM will ignore malicious con
 ## 4. Repository map
 
 ```text
-src/mcpshield/
+src/mcp_phalanx/
   api/                 Read-only FastAPI API and static dashboard
-  cli/                 `mcpshield-*` command-line entry points
+  cli/                 `mcp-phalanx-*` command-line entry points
   config/              Typed TOML configuration
   interceptors/        Security-control extension points and Layer 3
   observability/       Redacted SQLite trace storage
@@ -91,8 +91,8 @@ uv run pytest
 For a local filesystem demonstration:
 
 ```powershell
-uv run mcpshield-proxy --config configs/filesystem.toml
-uv run mcpshield-api --database data/traces.db
+uv run mcp-phalanx-proxy --config configs/filesystem.toml
+uv run mcp-phalanx-api --database data/traces.db
 ```
 
 The proxy is normally launched by an MCP host over stdio. The API can be run separately because it only reads persisted traces.
@@ -112,7 +112,7 @@ The proxy is normally launched by an MCP host over stdio. The API can be run sep
 ## 7. Useful companion documents
 
 - `README.md`: installation and local run commands.
-- `docs/MCPShield_Architectural_Briefing.md`: deeper architecture and stakeholder explanation. Treat performance and effectiveness statements in it as claims requiring validation, not as established experiment results.
+- `docs/MCP-Phalanx_Architectural_Briefing.md`: deeper architecture and stakeholder explanation. Treat performance and effectiveness statements in it as claims requiring validation, not as established experiment results.
 - The project owner’s original capstone brief: authoritative source for the research scope, literature framing, and prohibited novelty claims.
 
 When requirements conflict, follow the project owner’s latest instruction and preserve the academic boundaries above.

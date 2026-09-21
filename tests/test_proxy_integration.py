@@ -10,7 +10,7 @@ from mcp import ClientSession, StdioServerParameters
 from mcp.client.stdio import stdio_client
 from mcp.types import TextContent
 
-from mcpshield.observability.traces import TraceStore
+from mcp_phalanx.observability.traces import TraceStore
 
 PROJECT_ROOT = Path(__file__).parents[1]
 
@@ -18,12 +18,12 @@ PROJECT_ROOT = Path(__file__).parents[1]
 def test_filesystem_server_is_reached_through_proxy(tmp_path: Path) -> None:
     """A real MCP client can list and call tools through one proxy process."""
 
-    config_path = _write_config(tmp_path, "mcpshield.reference_servers.filesystem")
+    config_path = _write_config(tmp_path, "mcp_phalanx.reference_servers.filesystem")
 
     async def scenario() -> None:
         parameters = StdioServerParameters(
             command=sys.executable,
-            args=["-m", "mcpshield.cli.proxy", "--config", str(config_path)],
+            args=["-m", "mcp_phalanx.cli.proxy", "--config", str(config_path)],
         )
         async with stdio_client(parameters) as (read, write):
             async with ClientSession(read, write) as session:
@@ -48,14 +48,14 @@ def test_sqlite_server_is_reached_through_proxy(tmp_path: Path) -> None:
     database_path = tmp_path / "reference.sqlite3"
     config_path = _write_config(
         tmp_path,
-        "mcpshield.reference_servers.sqlite",
-        extra_environment={"MCPSHIELD_SQLITE_DATABASE": database_path.as_posix()},
+        "mcp_phalanx.reference_servers.sqlite",
+        extra_environment={"MCP_PHALANX_SQLITE_DATABASE": database_path.as_posix()},
     )
 
     async def scenario() -> None:
         parameters = StdioServerParameters(
             command=sys.executable,
-            args=["-m", "mcpshield.cli.proxy", "--config", str(config_path)],
+            args=["-m", "mcp_phalanx.cli.proxy", "--config", str(config_path)],
         )
         async with stdio_client(parameters) as (read, write):
             async with ClientSession(read, write) as session:

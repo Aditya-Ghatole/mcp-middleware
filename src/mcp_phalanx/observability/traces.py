@@ -11,7 +11,7 @@ from uuid import uuid4
 
 from anyio.to_thread import run_sync
 
-from mcpshield.protocol.messages import Direction, MessageDetails
+from mcp_phalanx.protocol.messages import Direction, MessageDetails
 
 
 @dataclass(frozen=True, slots=True)

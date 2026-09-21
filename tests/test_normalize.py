@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from mcpshield.interceptors.normalize import (
+from mcp_phalanx.interceptors.normalize import (
     decode_base64_fragments,
     normalize,
     normalize_homoglyphs,

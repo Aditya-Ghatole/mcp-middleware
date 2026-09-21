@@ -82,7 +82,7 @@ def blocked_error(session_message: SessionMessage, reason: str) -> SessionMessag
     error = types.JSONRPCError(
         jsonrpc="2.0",
         id=request_id,
-        error=types.ErrorData(code=-32050, message="Blocked by MCPShield", data={"reason": reason}),
+        error=types.ErrorData(code=-32050, message="Blocked by MCP-Phalanx", data={"reason": reason}),
     )
     return SessionMessage(message=types.JSONRPCMessage(root=error))
 

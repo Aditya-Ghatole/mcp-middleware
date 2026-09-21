@@ -7,11 +7,11 @@ from pathlib import Path
 
 from mcp.server.fastmcp import FastMCP
 
-mcp = FastMCP("MCPShield Vulnerable Filesystem Reference")
+mcp = FastMCP("MCP-Phalanx Vulnerable Filesystem Reference")
 
 
 def _sandbox_root() -> Path:
-    configured = os.environ.get("MCPSHIELD_FILESYSTEM_ROOT")
+    configured = os.environ.get("MCP_PHALANX_FILESYSTEM_ROOT")
     root = Path(configured) if configured is not None else Path("fixtures/filesystem/sandbox")
     root.mkdir(parents=True, exist_ok=True)
     return root.resolve()

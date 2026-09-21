@@ -6,8 +6,8 @@ from dataclasses import dataclass
 
 from mcp.shared.message import SessionMessage
 
-from mcpshield.interceptors.chain import InterceptionAction, InterceptionDecision
-from mcpshield.protocol.messages import Direction, MessageDetails
+from mcp_phalanx.interceptors.chain import InterceptionAction, InterceptionDecision
+from mcp_phalanx.protocol.messages import Direction, MessageDetails
 
 
 @dataclass(frozen=True, slots=True)

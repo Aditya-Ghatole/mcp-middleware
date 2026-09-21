@@ -1,4 +1,4 @@
-"""Small real MCP client used to exercise a configured MCPShield proxy."""
+"""Small real MCP client used to exercise a configured MCP-Phalanx proxy."""
 
 from __future__ import annotations
 
@@ -14,8 +14,8 @@ from mcp.client.stdio import stdio_client
 
 
 def _arguments() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description="Call a real MCPShield proxy")
-    parser.add_argument("--config", required=True, type=Path, help="Path passed to mcpshield-proxy")
+    parser = argparse.ArgumentParser(description="Call a real MCP-Phalanx proxy")
+    parser.add_argument("--config", required=True, type=Path, help="Path passed to mcp-phalanx-proxy")
     parser.add_argument("--tool", default="read_file", help="Tool name to call after listing tools")
     parser.add_argument(
         "--arg",
@@ -34,7 +34,7 @@ async def _run(config_path: Path, tool_name: str, args_list: list[str] | None) -
             arguments[key.strip()] = value.strip()
     proxy_parameters = StdioServerParameters(
         command=sys.executable,
-        args=["-m", "mcpshield.cli.proxy", "--config", str(config_path.resolve())],  # noqa: ASYNC240
+        args=["-m", "mcp_phalanx.cli.proxy", "--config", str(config_path.resolve())],  # noqa: ASYNC240
     )
     async with stdio_client(proxy_parameters) as (read, write):
         async with ClientSession(read, write) as session:

@@ -7,9 +7,9 @@ import asyncio
 import mcp.types as types
 from mcp.shared.message import SessionMessage
 
-from mcpshield.interceptors.chain import InterceptionAction
-from mcpshield.interceptors.limits import MessageSizeLimit
-from mcpshield.protocol.messages import Direction, inspect_message
+from mcp_phalanx.interceptors.chain import InterceptionAction
+from mcp_phalanx.interceptors.limits import MessageSizeLimit
+from mcp_phalanx.protocol.messages import Direction, inspect_message
 
 
 def test_message_limit_blocks_an_oversized_request() -> None:

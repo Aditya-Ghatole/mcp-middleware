@@ -12,7 +12,7 @@ from fastapi.responses import StreamingResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
-from mcpshield.observability.traces import TraceEvent, TraceStore
+from mcp_phalanx.observability.traces import TraceEvent, TraceStore
 
 
 class TraceResponse(BaseModel):
@@ -64,7 +64,7 @@ def create_app(database_path: Path) -> FastAPI:
         await store.initialize()
         yield
 
-    application = FastAPI(title="MCPShield Control Plane", lifespan=lifespan)
+    application = FastAPI(title="MCP-Phalanx Control Plane", lifespan=lifespan)
 
     @application.get("/api/health", response_model=HealthResponse)
     async def health() -> HealthResponse:

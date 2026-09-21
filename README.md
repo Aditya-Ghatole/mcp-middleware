@@ -1,7 +1,7 @@
-# MCPShield
+# MCP-Phalanx
 
-MCPShield is a transparent, stdio-based Model Context Protocol (MCP) proxy for
-security research. An MCP host connects to MCPShield; MCPShield maintains one
+MCP-Phalanx is a transparent, stdio-based Model Context Protocol (MCP) proxy for
+security research. An MCP host connects to MCP-Phalanx; MCP-Phalanx maintains one
 persistent connection to the configured upstream MCP server and records the
 real protocol traffic it forwards.
 
@@ -12,13 +12,13 @@ implemented.
 
 ## Components
 
-- `mcpshield-proxy`: the MCP data-plane proxy. It is the only component that
+- `mcp-phalanx-proxy`: the MCP data-plane proxy. It is the only component that
   forwards MCP messages.
-- `mcpshield-api`: a read-only FastAPI control plane. It serves health and
+- `mcp-phalanx-api`: a read-only FastAPI control plane. It serves health and
   trace data; it never invokes MCP tools.
-- `mcpshield-filesystem-server`: an intentionally vulnerable filesystem
+- `mcp-phalanx-filesystem-server`: an intentionally vulnerable filesystem
   reference server, isolated to `fixtures/filesystem`.
-- `mcpshield-sqlite-server`: an intentionally vulnerable SQLite reference
+- `mcp-phalanx-sqlite-server`: an intentionally vulnerable SQLite reference
   server, isolated to a local database file.
 
 ## Development setup
@@ -32,13 +32,13 @@ uv sync --all-groups
 Run a filesystem proxy:
 
 ```powershell
-uv run mcpshield-proxy --config configs/filesystem.toml
+uv run mcp-phalanx-proxy --config configs/filesystem.toml
 ```
 
 In another terminal, start the dashboard API:
 
 ```powershell
-uv run mcpshield-api --database data/traces.db
+uv run mcp-phalanx-api --database data/traces.db
 ```
 
 Open `http://127.0.0.1:8000`. The dashboard shows only persisted trace events;

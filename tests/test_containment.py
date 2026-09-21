@@ -13,12 +13,12 @@ from typing import Any
 import mcp.types as types
 from mcp.shared.message import SessionMessage
 
-from mcpshield.config.settings import ContainmentConfiguration
-from mcpshield.interceptors.containment import (
+from mcp_phalanx.config.settings import ContainmentConfiguration
+from mcp_phalanx.interceptors.containment import (
     _HEURISTIC_PATTERNS,
     InboundContainment,
 )
-from mcpshield.protocol.messages import Direction
+from mcp_phalanx.protocol.messages import Direction
 
 
 def _make_config(
@@ -144,7 +144,7 @@ class TestInboundContainment:
         return InboundContainment(config)
 
     def _dummy_details(self, method: str | None = "tools/call:read_file") -> MessageDetails:
-        from mcpshield.protocol.messages import MessageDetails
+        from mcp_phalanx.protocol.messages import MessageDetails
         return MessageDetails(method=method, request_id="1", summary="", byte_count=0)
 
     def test_forwards_outbound_messages_untouched(self) -> None:
@@ -167,7 +167,7 @@ class TestInboundContainment:
             interceptor.inspect(Direction.UPSTREAM_TO_CLIENT, response, self._dummy_details())
         )
         text = _extract_text(decision.message)
-        assert "MCPSHIELD" not in text
+        assert "MCP-PHALANX" not in text
         assert "Revenue up 14%" in text
 
     def test_taint_marks_obvious_injection(self) -> None:
@@ -183,7 +183,7 @@ class TestInboundContainment:
         )
         text = _extract_text(decision.message)
         assert "<untrusted_external_data>" in text
-        assert "MCPSHIELD" in text
+        assert "MCP-PHALANX" in text
 
     def test_taint_preserves_original_text(self) -> None:
         """The original text should still be present inside the taint wrapper."""
