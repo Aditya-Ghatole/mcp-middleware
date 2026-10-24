@@ -21,4 +21,6 @@ output/
 data/*.db
 data/*.db-shm
 data/*.db-wal
+data/*.sqlite3
+data/northwind/*.sqlite3
 data/traces.db

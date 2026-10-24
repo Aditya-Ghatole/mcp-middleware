@@ -1,0 +1,22 @@
+[policy]
+default_effect = "deny"
+
+[[tool]]
+name = "search_products"
+effect = "allow"
+
+[[tool]]
+name = "get_product"
+effect = "allow"
+
+[[tool]]
+name = "get_order"
+effect = "allow"
+
+[[tool]]
+name = "sales_summary"
+effect = "allow"
+
+[[tool]]
+name = "get_product_note"
+effect = "allow"

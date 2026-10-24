@@ -7,7 +7,6 @@ import asyncio
 import json
 import sys
 from pathlib import Path
-from typing import cast
 
 from mcp import ClientSession, StdioServerParameters
 from mcp.client.stdio import stdio_client
@@ -15,13 +14,18 @@ from mcp.client.stdio import stdio_client
 
 def _arguments() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Call a real MCP-Phalanx proxy")
-    parser.add_argument("--config", required=True, type=Path, help="Path passed to mcp-phalanx-proxy")
+    parser.add_argument(
+        "--config", required=True, type=Path, help="Path passed to mcp-phalanx-proxy"
+    )
     parser.add_argument("--tool", default="read_file", help="Tool name to call after listing tools")
     parser.add_argument(
         "--arg",
         dest="args",
         action="append",
-        help="Arguments in key=value format (e.g., --arg path=file.txt). Can be specified multiple times.",
+        help=(
+            "Arguments in key=value format (for example, --arg path=file.txt). "
+            "Can be specified multiple times."
+        ),
     )
     return parser.parse_args()
 
@@ -31,7 +35,11 @@ async def _run(config_path: Path, tool_name: str, args_list: list[str] | None) -
     if args_list:
         for item in args_list:
             key, _, value = item.partition("=")
-            arguments[key.strip()] = value.strip()
+            stripped = value.strip()
+            try:
+                arguments[key.strip()] = json.loads(stripped)
+            except json.JSONDecodeError:
+                arguments[key.strip()] = stripped
     proxy_parameters = StdioServerParameters(
         command=sys.executable,
         args=["-m", "mcp_phalanx.cli.proxy", "--config", str(config_path.resolve())],  # noqa: ASYNC240

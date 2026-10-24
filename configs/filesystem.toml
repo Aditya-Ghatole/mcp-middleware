@@ -7,10 +7,13 @@ working_directory = ".."
 trace_database = "../data/traces.db"
 max_message_bytes = 1000000
 
+[security]
+l0_enabled = true
+l1_enabled = true
+l2_enabled = true
+policy_file = "policies/filesystem_demo.toml"
+
 [containment]
 enabled = true
-model_name = "protectai/deberta-v3-base-prompt-injection-v2"
-confidence_threshold_block = 0.85
-confidence_threshold_warn = 0.50
+mode = "deterministic"
 high_risk_tools = ["read_file", "write_file"]
-use_onnx = false

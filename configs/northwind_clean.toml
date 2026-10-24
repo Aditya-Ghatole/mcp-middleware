@@ -1,0 +1,22 @@
+[upstream]
+command = "${python}"
+arguments = ["-m", "mcp_phalanx.reference_servers.northwind"]
+working_directory = ".."
+
+[upstream.environment]
+MCP_PHALANX_NORTHWIND_DATABASE = "data/northwind/northwind_clean.sqlite3"
+
+[runtime]
+trace_database = "../data/traces.db"
+max_message_bytes = 1000000
+
+[security]
+l0_enabled = true
+l1_enabled = true
+l2_enabled = true
+policy_file = "policies/northwind.toml"
+
+[containment]
+enabled = true
+mode = "deterministic"
+high_risk_tools = []

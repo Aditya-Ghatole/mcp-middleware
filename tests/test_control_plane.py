@@ -33,11 +33,12 @@ def test_control_plane_lists_persisted_traces(tmp_path: Path) -> None:
 
     asyncio.run(seed())
     with TestClient(create_app(database_path)) as client:
-        response: Any = client.get("/api/traces")
+        typed_client: Any = cast(Any, client)
+        response: Any = typed_client.get("/api/traces")
         assert response.status_code == 200
         body = cast(list[dict[str, Any]], response.json())
         assert len(body) == 1
         assert body[0]["method"] == "tools/list"
-        openapi_resp: Any = client.get("/openapi.json")
+        openapi_resp: Any = typed_client.get("/openapi.json")
         openapi_paths = cast(dict[str, Any], openapi_resp.json())["paths"]
         assert "/api/execute" not in openapi_paths

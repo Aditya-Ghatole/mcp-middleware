@@ -1,0 +1,12 @@
+# Local, presentation-only policy for the intentionally vulnerable fixture.
+[policy]
+default_effect = "deny"
+
+[[tool]]
+name = "query_sql"
+effect = "allow"
+sql_parameters = ["query"]
+
+[[tool]]
+name = "execute_sql"
+effect = "deny"

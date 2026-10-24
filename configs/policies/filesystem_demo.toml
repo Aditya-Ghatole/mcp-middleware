@@ -1,0 +1,23 @@
+# Local, presentation-only policy for the intentionally vulnerable fixture.
+[policy]
+default_effect = "deny"
+
+[[tool]]
+name = "list_directory"
+effect = "allow"
+path_parameters = ["path"]
+allowed_path_roots = ["docs"]
+
+[[tool]]
+name = "read_file"
+effect = "allow"
+path_parameters = ["path"]
+allowed_path_roots = ["docs"]
+
+[[tool]]
+name = "write_file"
+effect = "deny"
+
+[[tool]]
+name = "create_directory"
+effect = "deny"

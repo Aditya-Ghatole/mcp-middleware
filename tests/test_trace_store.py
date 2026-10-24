@@ -5,7 +5,9 @@ from __future__ import annotations
 import asyncio
 from pathlib import Path
 
-from mcp_phalanx.observability.traces import TraceEvent, TraceStore
+import anyio
+
+from mcp_phalanx.observability.traces import TraceEvent, TraceSink, TraceStore
 from mcp_phalanx.protocol.messages import Direction, MessageDetails
 
 
@@ -33,5 +35,30 @@ def test_trace_store_persists_and_cursors_events(tmp_path: Path) -> None:
         await store.append(second)
         after_first = await store.list_events(after=first.event_id, limit=10)
         assert [event.event_id for event in after_first] == [second.event_id]
+
+    asyncio.run(scenario())
+
+
+def test_bounded_trace_sink_records_queue_overflow(tmp_path: Path) -> None:
+    """Queue overload is visible in a stored summary instead of blocking traffic."""
+
+    async def scenario() -> None:
+        store = TraceStore(tmp_path / "traces.db")
+        await store.initialize()
+        sink = TraceSink(store, "session-overflow", capacity=1)
+        event = TraceEvent.from_message(
+            session_id="session-overflow",
+            direction=Direction.CLIENT_TO_UPSTREAM,
+            details=MessageDetails("tools/list", "1", "MCP tools/list request", 100),
+            disposition="forward",
+            latency_ms=None,
+        )
+        async with anyio.create_task_group() as task_group:
+            task_group.start_soon(sink.run)
+            sink.record(event)
+            sink.record(event)
+            await sink.close()
+        events = await store.list_events(after=None, limit=10)
+        assert any(item.reason_code == "TRACE_QUEUE_FULL" for item in events)
 
     asyncio.run(scenario())

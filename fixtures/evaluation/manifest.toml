@@ -1,0 +1,40 @@
+[suite]
+name = "local-l0-l3-ablation"
+
+[[case]]
+id = "l0_poisoned_metadata"
+target = "metadata"
+operation = "list_tools"
+guard_layer = "l0"
+
+[[case]]
+id = "l1_path_escape"
+target = "filesystem"
+operation = "call_tool"
+tool = "read_file"
+arguments = { path = "../outside_sandbox/sentinel.txt" }
+guard_layer = "l1"
+
+[[case]]
+id = "l2_destructive_sql"
+target = "sqlite"
+operation = "call_tool"
+tool = "execute_sql"
+arguments = { script = "DROP TABLE users" }
+guard_layer = "l2"
+
+[[case]]
+id = "l3_poisoned_response"
+target = "filesystem"
+operation = "call_tool"
+tool = "read_file"
+arguments = { path = "docs/poisoned_report.txt" }
+guard_layer = "l3"
+
+[[case]]
+id = "benign_filesystem_read"
+target = "filesystem"
+operation = "call_tool"
+tool = "read_file"
+arguments = { path = "docs/report_2026.txt" }
+guard_layer = "none"

@@ -6,19 +6,30 @@ readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
     "fastapi>=0.141,<1.0",
+    "jsonschema>=4.23,<5.0",
     "mcp>=1.29,<2.0",
-    "onnxruntime>=1.19",
+    "uvicorn>=0.38,<1.0",
+]
+
+[project.optional-dependencies]
+classifier = [
     "torch>=2.4",
     "transformers>=4.45,<5.0",
-    "uvicorn>=0.38,<1.0",
+]
+agent = [
+    "openai>=2.0,<3.0",
 ]
 
 [project.scripts]
 mcp-phalanx-proxy = "mcp_phalanx.cli.proxy:main"
 mcp-phalanx-api = "mcp_phalanx.cli.api:main"
 mcp-phalanx-demo-client = "mcp_phalanx.cli.demo_client:main"
+mcp-phalanx-demo = "mcp_phalanx.cli.demo:main"
+mcp-phalanx-evaluate = "mcp_phalanx.cli.evaluate:main"
 mcp-phalanx-filesystem-server = "mcp_phalanx.reference_servers.filesystem:main"
 mcp-phalanx-sqlite-server = "mcp_phalanx.reference_servers.sqlite:main"
+mcp-phalanx-northwind-server = "mcp_phalanx.reference_servers.northwind:main"
+mcp-phalanx-build-db = "mcp_phalanx.fixtures.northwind:main"
 
 [dependency-groups]
 dev = [

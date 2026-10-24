@@ -1,65 +1,34 @@
-# MCP Middleware Improvement Action Plan
+# MCP-Phalanx Completion and Research Action Plan
 
-This document outlines the step-by-step action plan to address the academic, structural, and security concerns raised during our architectural review. The plan is organized by difficulty, allowing us to tackle the "quick wins" first before moving into deep engineering work.
+## Current implementation
 
----
+- A persistent, bidirectional stdio proxy with separate read-only FastAPI dashboard.
+- Deterministic L0 metadata screening, L1 invocation validation, L2 default-deny policy, and L3 inbound containment.
+- Local filesystem and SQLite fixtures with demonstration TOML policies.
+- Bounded, batched, redacted SQLite tracing.
+- Benign and poisoned-response demo scenarios.
+- A local runner for all 16 L0–L3 on/off profiles, exporting raw JSON and CSV records.
 
-## Phase 1: Quick Wins & Hygiene (Easy)
-*These tasks resolve immediate academic red flags and branding collisions with minimal code impact.*
+The current code is a research prototype. Passing tests shows the implementation behaves as tested; it does not establish attack prevention or production readiness.
 
-- [ ] **Step 1.1: Project Renaming & Branding Update**
-  - **Why:** The name "MCP-Phalanx" collides exactly with a 2026 Zhou et al. arXiv preprint. Keeping it will cause citation confusion and reviewer pushback.
-  - **Action:** Select a new name (e.g., `MCP-Gate`, `LayerGuard-MCP`, or `Aegis-MCP`). 
-  - **Codebase impact:** Perform a global find-and-replace in `PROJECT_CONTEXT.md`, `README.md`, `pyproject.toml`, the CLI entry points, and Python package structure (`src/mcp_phalanx` -> `src/new_name`).
+## Work required before reporting research results
 
-- [ ] **Step 1.2: Literature Review Correction**
-  - **Why:** Rows 6 and 9 (Siameh et al.) in the literature spreadsheet are the preprint and conference versions of the same paper, reporting identical metrics.
-  - **Action:** Merge these into a single citation cluster in any related work drafts or review scripts (e.g., `build_review_paper.py`). Ensure the total paper count reaches the target >30 cleanly using the 13 new papers vetted in our previous conversation.
+1. Review the local fixture manifest with the project supervisor and document why each benign/malicious case represents its intended category.
+2. Run the full ablation suite from a clean environment. Preserve the generated raw CSV/JSON, Git revision, dependency lock, OS, and Python version with the analysis.
+3. Add enough benign and malicious cases to estimate false rejection and detection rates meaningfully. The initial manifest is a smoke-test corpus, not a statistically adequate benchmark.
+4. If studying LLM task utility or attack success, add a documented host/model/task harness. The current evaluator exercises MCP traffic and proxy dispositions only; it does not measure what an LLM obeys.
+5. Review and cite the related-work sources in the capstone write-up. Do not state novelty for the controls themselves.
 
----
+## Known technical limits
 
-## Phase 2: Academic Framing & Scope Definition (Medium)
-*These tasks involve updating the project's documentation to establish an "ironclad" novelty defense and protect against "incremental novelty" rejections.*
+- The proxy currently supports stdio only; Streamable HTTP needs a separate transport adapter and its own protocol/security tests.
+- L0 uses deterministic pattern checks and a bounded JSON Schema subset. It can miss semantic attacks and can remove benign metadata.
+- L1 SQL checks use a conservative local lexer and policy constraints. They do not replace a database read-only connection or a full SQL parser.
+- L3 pattern-based containment can miss attacks or flag benign content. Taint tags do not guarantee model compliance.
+- Authorization is per tool call. Cross-call semantic chains and human approval flows are not implemented.
+- Trace writes are asynchronous and bounded; on overload, events may be dropped and a summary event is recorded when persistence recovers.
+- The dashboard has no authentication and is intended for localhost research use only.
 
-- [ ] **Step 2.1: Define the "Tool Invocation Lifecycle" Scope**
-  - **Why:** Reviewers will attack the phrase "end-to-end pipeline" by pointing out network MITM attacks or base-model jailbreaks.
-  - **Action:** Update `docs/MCP-Phalanx_Architectural_Briefing.md` and your paper draft to explicitly state the pipeline secures the *Tool Invocation Lifecycle* (Discovery -> Intent -> Authorization -> Integration), explicitly placing transport-layer and container-escape vulnerabilities out of scope.
+## Research framing
 
-- [ ] **Step 2.2: Document the "Semantic Chaining" Limitation**
-  - **Why:** The pipeline currently appears stateless, meaning an attacker could exfiltrate data by splitting steps across multiple benign-looking tool calls.
-  - **Action:** Add a "Threat Model Limitations" section explicitly stating that the proxy evaluates tool calls in isolation. Acknowledge that defending against stateful "semantic chaining" remains future work.
-
-- [ ] **Step 2.3: Position as a "Systems-Engineering Solution"**
-  - **Why:** If the paper claims to invent RBAC or parameter validation, it will be rejected.
-  - **Action:** In the introduction, clarify that the novelty lies in integrating established primitives (WAF, RBAC, heuristics) into a holistic, deterministic, transparent stdio proxy for MCP, proven via a 2⁴ factorial ablation.
-
----
-
-## Phase 3: Engineering Depth for L0, L1, & L2 (Medium-Hard)
-*The codebase already has a great foundation (a true bidirectional stdio proxy, not just an API wrapper), and L3 uses deterministic heuristics/tainting. We need to build out the missing layers with enough engineering depth to impress systems reviewers.*
-
-- [ ] **Step 3.1: Implement L0 (Metadata Scanning)**
-  - **Action:** Build static analysis for the `tools/list` response. Don't just check for "bad words"—validate schema ASTs and ensure tool descriptions don't contain embedded system-prompt overrides.
-
-- [ ] **Step 3.2: Implement L1 (Parameter Validation)**
-  - **Action:** Build deep payload inspection for `tools/call` parameters. Go beyond basic JSON type-checking (e.g., detecting path traversal `../` in file paths or SQL injection payloads in string arguments).
-
-- [ ] **Step 3.3: Implement L2 (Policy Enforcement)**
-  - **Action:** Build the high-performance YAML gate. This needs to be fast—compile the YAML policies into a quick-lookup structure in Python to minimize latency overhead during tool calls.
-
----
-
-## Phase 4: Performance & Evaluation Rigor (Hard)
-*A 2⁴ factorial ablation is useless if the system is too slow or blocks legitimate user requests.*
-
-- [ ] **Step 4.1: Implement Latency Benchmarking**
-  - **Why:** Systems papers die if performance overhead isn't tracked.
-  - **Action:** Instrument the proxy (`src/mcp_phalanx/proxy/`) to track exactly how many milliseconds L0, L1, L2, and L3 add to the request/response cycle. Store these timings in the `observability` trace database.
-
-- [ ] **Step 4.2: Measure False Positive Rates (Utility Drop)**
-  - **Why:** A proxy that blocks all attacks but also blocks legitimate work is useless.
-  - **Action:** Update the ablation orchestration script to track False Rejection Rate (FRR) by running known-benign agent workflows (e.g., from AgentDojo) and measuring how often L1 or L3 incorrectly triggers.
-
-- [ ] **Step 4.3: Execute the 2⁴ Factorial Ablation**
-  - **Why:** This is the core research contribution.
-  - **Action:** Finalize the benchmark ingestion and orchestration to run the 16 combinations (L0..L3 on/off). Use a deterministic local setup or temperature=0 API calls to ensure reproducibility and keep costs down.
+Describe MCP-Phalanx as an engineering platform for a reproducible comparison of established defense patterns at MCP tool discovery, invocation, authorization, and response handling. Do not describe the project as a solved injection defense, a new algorithm, a production deployment, or an empirical result before the data has been collected and analyzed.

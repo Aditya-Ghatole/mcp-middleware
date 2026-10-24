@@ -15,6 +15,7 @@ class Direction(StrEnum):
 
     CLIENT_TO_UPSTREAM = "client_to_upstream"
     UPSTREAM_TO_CLIENT = "upstream_to_client"
+    SYSTEM = "system"
 
 
 @dataclass(frozen=True, slots=True)
@@ -68,6 +69,20 @@ def response_request_id(session_message: SessionMessage) -> str | None:
     return None
 
 
+def cancellation_request_id(session_message: SessionMessage) -> str | None:
+    """Return the request ID named by a valid MCP cancellation notification."""
+
+    message = session_message.message.root
+    if not isinstance(message, types.JSONRPCNotification):
+        return None
+    if message.method != "notifications/cancelled" or not isinstance(message.params, dict):
+        return None
+    request_id = message.params.get("requestId")
+    if isinstance(request_id, bool) or not isinstance(request_id, str | int):
+        return None
+    return str(request_id)
+
+
 def blocked_error(session_message: SessionMessage, reason: str) -> SessionMessage:
     """Construct a protocol-correct error for a blocked request or response."""
 
@@ -82,7 +97,11 @@ def blocked_error(session_message: SessionMessage, reason: str) -> SessionMessag
     error = types.JSONRPCError(
         jsonrpc="2.0",
         id=request_id,
-        error=types.ErrorData(code=-32050, message="Blocked by MCP-Phalanx", data={"reason": reason}),
+        error=types.ErrorData(
+            code=-32050,
+            message="Blocked by MCP-Phalanx",
+            data={"reason": reason},
+        ),
     )
     return SessionMessage(message=types.JSONRPCMessage(root=error))
 

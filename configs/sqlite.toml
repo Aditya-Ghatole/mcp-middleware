@@ -6,3 +6,14 @@ working_directory = ".."
 [runtime]
 trace_database = "../data/traces.db"
 max_message_bytes = 1000000
+
+[security]
+l0_enabled = true
+l1_enabled = true
+l2_enabled = true
+policy_file = "policies/sqlite_demo.toml"
+
+[containment]
+enabled = true
+mode = "deterministic"
+high_risk_tools = ["query_sql", "execute_sql"]

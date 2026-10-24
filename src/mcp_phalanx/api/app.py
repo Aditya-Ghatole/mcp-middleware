@@ -28,6 +28,10 @@ class TraceResponse(BaseModel):
     summary: str
     byte_count: int
     latency_ms: float | None
+    processing_ms: float | None
+    layer: str | None
+    reason_code: str | None
+    rule_id: str | None
 
     @classmethod
     def from_event(cls, event: TraceEvent) -> TraceResponse:
@@ -44,6 +48,10 @@ class TraceResponse(BaseModel):
             summary=event.summary,
             byte_count=event.byte_count,
             latency_ms=event.latency_ms,
+            processing_ms=event.processing_ms,
+            layer=event.layer,
+            reason_code=event.reason_code,
+            rule_id=event.rule_id,
         )
 
 
@@ -102,9 +110,12 @@ async def _stream_events(
             await anyio.sleep(0.75)
             continue
 
+        if cursor is None:
+            events.reverse()
+
         for event in events:
             response = TraceResponse.from_event(event)
             cursor = response.event_id
             payload = response.model_dump_json()
-            yield f"event: trace\ndata: {payload}\n\n"
+            yield f"id: {response.event_id}\nevent: trace\ndata: {payload}\n\n"
         await anyio.sleep(0.75)
